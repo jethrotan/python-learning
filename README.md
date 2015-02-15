@@ -8,3 +8,4 @@
 7.http://bilalaslam.com/2015/02/10/data-science-analysis-of-130-technical-interviews/
 8.http://radimrehurek.com/data_science_python/
 9.http://blog.yhathq.com/posts/11-python-libraries-you-might-not-know.html
+10.http://dataconomy.com/linear-regression-implementation-in-python
