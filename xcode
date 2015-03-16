@@ -1,0 +1,96 @@
+//fillhole
+		//{
+		//	int ww = myImg1.getWidth(), hh = myImg1.getHeight();
+		//	const int rr = 11;
+		//	const int rt = 2;
+		//	for(int i=0; i<hh; ++i)
+		//	{
+		//		for(int j=0; j<ww; ++j)
+		//		{
+		//			int vr = *(dispImg+i*ww+j)+0.5;
+		//			if(vr>=0) 
+		//			{
+		//				//*(dispOut+i*ww+j) = vr;
+		//				//continue;
+		//				float sum = 0;
+		//				float cnt = 0;
+		//				int cv = *(leftImg+i*ww+j);
+		//				for(int y=i-rt; y<=i+rt; ++y)
+		//				{
+		//					if(y<0||y>=hh) continue;
+		//					for(int x=j-rt; x<=j+rt; ++x)
+		//					{
+		//						if(x<0||x>=ww) continue;
+		//						float vv = *(dispImg+y*ww+x)+0.5;
+		//						if(vv<0) continue;
+		//						int dv = *(leftImg+i*ww+j)-cv;							
+		//						float weight = exp(-1.0*dv*dv/10);
+		//						sum += vv*weight; cnt+=weight;
+		//					}
+		//				}
+		//				*(dispOut+i*ww+j) = cnt==0?0:(sum/cnt+0.5);
+		//			}
+		//			else
+		//			{
+		//				float sum = 0;
+		//				float cnt = 0;
+		//				int cv = *(leftImg+i*ww+j);
+		//				for(int y=i-rr; y<=i+rr; ++y)
+		//				{
+		//					if(y<0||y>=hh) continue;
+		//					for(int x=j-rr; x<=j+rr; ++x)
+		//					{
+		//						if(x<0||x>=ww) continue;
+		//						float vv = *(dispImg+y*ww+x)+0.5;
+		//						if(vv<0) continue;
+		//						int dv = *(leftImg+i*ww+j)-cv;							
+		//						float weight = exp(-1.0*dv*dv/10);
+		//						sum += vv*weight; cnt+=weight;
+		//					}
+		//				}
+		//				*(dispOut+i*ww+j) = cnt==0?0:(sum/cnt+0.5);
+		//			}
+		//		}				
+		//	}
+		//}
+		
+		for(int y=2; y<height-2; y++)
+			for(int x=2; x<width-2; x++)
+			{
+				uint16* pCosty1 = getDispAddr_xyd(dsi, width, maxDisp+1, y,x,0);
+				uint16* pCosty2 = getDispAddr_xyd(dsi, width, maxDisp+1, y-2,x,0);
+				uint16* pCosty3 = getDispAddr_xyd(dsi, width, maxDisp+1, y-1,x,0);
+				uint16* pCosty4 = getDispAddr_xyd(dsi, width, maxDisp+1, y+1,x,0);
+				uint16* pCosty5 = getDispAddr_xyd(dsi, width, maxDisp+1, y+2,x,0);
+
+				uint16* pCostx2 = getDispAddr_xyd(dsi, width, maxDisp+1, y,x-2,0);
+				uint16* pCostx3 = getDispAddr_xyd(dsi, width, maxDisp+1, y,x-1,0);
+				uint16* pCostx4 = getDispAddr_xyd(dsi, width, maxDisp+1, y,x+1,0);
+				uint16* pCostx5 = getDispAddr_xyd(dsi, width, maxDisp+1, y,x+2,0);
+
+				//uint16 pCostBase = *pCosty1;
+				uint32 minCost = (*pCosty1) + (*pCosty2) + (*pCosty3) + (*pCosty4)+(*pCosty5)+*pCostx2+*pCostx3+*pCostx4+*pCostx5;
+				minCost = minCost;
+				uint32 bestDisp = 0;
+				for(int k=0; k<=maxDisp; k++)
+				{
+					uint16* pCost1 = getDispAddr_xyd(dsi, width, maxDisp+1, y,x,k);
+					uint16* pCosty2 = getDispAddr_xyd(dsi, width, maxDisp+1, y-2,x,k);
+					uint16* pCosty3 = getDispAddr_xyd(dsi, width, maxDisp+1, y-1,x,k);
+					uint16* pCosty4 = getDispAddr_xyd(dsi, width, maxDisp+1, y+1,x,k);
+					uint16* pCosty5 = getDispAddr_xyd(dsi, width, maxDisp+1, y+2,x,k);
+
+					uint16* pCostx2 = getDispAddr_xyd(dsi, width, maxDisp+1, y,x-2,k);
+					uint16* pCostx3 = getDispAddr_xyd(dsi, width, maxDisp+1, y,x-1,k);
+					uint16* pCostx4 = getDispAddr_xyd(dsi, width, maxDisp+1, y,x+1,k);
+					uint16* pCostx5 = getDispAddr_xyd(dsi, width, maxDisp+1, y,x+2,k);
+					uint32 pCost = *pCost1+*pCosty2+*pCosty3+*pCosty4+*pCosty5+*pCostx2+*pCostx3+*pCostx4+*pCostx5;
+
+					if(pCost < minCost) {
+						minCost = pCost;
+						bestDisp = k;
+					}
+				}
+				output[y*width + x] = bestDisp;
+				
+			}
